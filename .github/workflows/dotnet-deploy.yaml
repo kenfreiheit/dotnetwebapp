@@ -25,7 +25,7 @@ jobs:
       env:
         REMOTE_DEPLOY_KEY: ${{ secrets.REMOTE_DEPLOY_KEY }}
     - name: rsync deploy
-      run: rsync -arv --delete -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ${REMOTE_PORT}" /home/runner/work/dotnetwebapp/dotnetwebapp/bin/Release/net5.0/publish/ ${REMOTE_USER}@${REMOTE_HOST}:/var/www/kestrel/publish/
+      run: rsync -rv --delete -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ${REMOTE_PORT}" /home/runner/work/dotnetwebapp/dotnetwebapp/bin/Release/net5.0/publish/ ${REMOTE_USER}@${REMOTE_HOST}:/var/www/kestrel/publish/
       env:
         REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
         REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
