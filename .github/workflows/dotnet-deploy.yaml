@@ -1,0 +1,29 @@
+name: asp dotnet core deploy
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: '5.0.x'
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Publish
+      run: dotnet publish -c Release
+    - name: ssh key generate
+      run: echo "${REMOTE_DEPLOY_KEY}" > key && chmod 600 key
+      env:
+        REMOTE_DEPLOY_KEY: ${{ secrets.REMOTE_DEPLOY_KEY }}
+    - name: rsync deploy
+      run: rsync -arv --delete -e "ssh -i key -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ${REMOTE_PORT}" /home/runner/work/dotnetwebapp/dotnetwebapp/bin/Release/net5.0/publish/ ${REMOTE_USER}@${REMOTE_HOST}:/var/www/kestrel/publish/
+      env:
+        REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+        REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+        REMOTE_USER: ${{ secrets.REMOTE_USER }}
